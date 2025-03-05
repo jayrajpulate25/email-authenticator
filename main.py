@@ -11,6 +11,11 @@ import os
 from dotenv import load_dotenv
 import redis
 
+from fastapi import FastAPI, Query, HTTPException
+import requests
+#import os
+#from dotenv import load_dotenv
+
 load_dotenv()
 app = FastAPI()
 
@@ -137,3 +142,37 @@ async def verify_otp(verification: OTPVerification):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+# Load environment variables from .env file
+load_dotenv()
+
+API_URL = os.getenv("API_URL")
+AUTH_TOKEN = os.getenv("AUTH_TOKEN")
+
+HEADERS = {
+    "Authorization": f"Bearer {AUTH_TOKEN}",
+}
+
+app = FastAPI()
+
+@app.get("/search_courses")
+def search_courses(subject: str = Query(..., description="Subject to search for")):
+    params = {"filters[search]": subject}
+    response = requests.get(API_URL, headers=HEADERS, params=params)
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail="Failed to fetch courses")
+
+    data = response.json()
+    courses = data.get("data", {}).get("result", [])
+
+    if not courses:
+        return {"message": "No courses found"}
+
+    course_urls = [f"{i+1}. {course['course_url']}" for i, course in enumerate(courses)]
+
+    return {"message": "Courses found", "course_urls": "\n".join(course_urls)}
+
+
+
+    
