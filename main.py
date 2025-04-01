@@ -140,18 +140,14 @@ if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
 
-
-
-
-API_URL = os.getenv("API_URL")
-AUTH_TOKEN = os.getenv("AUTH_TOKEN")
-
-HEADERS = {
-    "Authorization": f"Bearer {AUTH_TOKEN}",
-}
-
 @app.get("/search_courses")
 def search_courses(subject: str = Query(..., description="Subject to search for")):
+    API_URL = os.getenv("API_URL")
+    AUTH_TOKEN = os.getenv("AUTH_TOKEN")
+
+    HEADERS = {
+        "Authorization": f"Bearer {AUTH_TOKEN}",
+    }
     params = {"filters[search]": subject}
     response = requests.get(API_URL, headers=HEADERS, params=params)
 
