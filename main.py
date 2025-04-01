@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Query, HTTPException
 from pydantic import BaseModel
 import aiosmtplib
 from email.mime.text import MIMEText
@@ -10,11 +10,7 @@ from typing import Dict
 import os
 from dotenv import load_dotenv
 import redis
-
-from fastapi import FastAPI, Query, HTTPException
 import requests
-#import os
-#from dotenv import load_dotenv
 
 load_dotenv()
 app = FastAPI()
@@ -143,8 +139,9 @@ if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
-# Load environment variables from .env file
-load_dotenv()
+
+
+
 
 API_URL = os.getenv("API_URL")
 AUTH_TOKEN = os.getenv("AUTH_TOKEN")
@@ -152,8 +149,6 @@ AUTH_TOKEN = os.getenv("AUTH_TOKEN")
 HEADERS = {
     "Authorization": f"Bearer {AUTH_TOKEN}",
 }
-
-app = FastAPI()
 
 @app.get("/search_courses")
 def search_courses(subject: str = Query(..., description="Subject to search for")):
